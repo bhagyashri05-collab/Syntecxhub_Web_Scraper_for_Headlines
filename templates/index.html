@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NewsScrape AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="glow-bg"></div>
+    <div class="glow-bg blur"></div>
+
+    <header class="nav">
+      <div class="brand">
+        <div class="badge">
+          <span>NS</span>
+        </div>
+        <div>
+          <p class="eyebrow">Realtime Aggregator</p>
+          <h1>NewsScrape AI</h1>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <span class="status-dot"></span>
+        <span class="status-label">Live mode</span>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero card">
+        <div>
+          <p class="hero-label">Smart Web Scraper</p>
+          <h2>Tap into trusted news sources with one click.</h2>
+          <p class="hero-sub">
+            Fetch, filter, and download headlines from BBC, Hacker News, and NPR while honoring robots.txt and best practices.
+          </p>
+        </div>
+        <div class="hero-visual">
+          <div class="pulse"></div>
+          <div class="hero-icon">📰</div>
+          <p>Multi-source · Keyword aware · Delay friendly</p>
+        </div>
+      </section>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <section class="notifications">
+        {% for category, message in messages %}
+        <div class="alert {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </section>
+      {% endif %}
+      {% endwith %}
+
+      <section class="scrape-panel card">
+        <form method="POST" class="scrape-form">
+          <div class="input-wrap">
+            <label for="keyword">Search the headlines</label>
+            <div class="search-box">
+              <input
+                type="text"
+                id="keyword"
+                name="keyword"
+                value="{{ keyword }}"
+                placeholder="Try climate, economy, AI breakthroughs..."
+              />
+              <button type="submit" class="primary-btn">
+                <span>Show Headlines</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 12h14M13 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="source-wrap">
+            <p>Select sources</p>
+            <div class="source-grid">
+              {% for key, cfg in sources.items() %}
+              <label class="source-chip">
+                <input type="checkbox" name="sources" value="{{ key }}" {% if key in selected_sources %}checked{% endif %} />
+                <span>{{ cfg.name }}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="download-row">
+            <p>Export format</p>
+            <div class="download-buttons">
+              <button type="submit" name="export_format" value="csv" class="download-btn csv">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 5v14M18 13l-6 6-6-6" />
+                </svg>
+                Download CSV
+              </button>
+              <button type="submit" name="export_format" value="json" class="download-btn json">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 7h2v10H8m6-10h2v10h-2" />
+                  <path d="M6 9c-1.5 1.5-1.5 4 0 5.5M18 9c1.5 1.5 1.5 4 0 5.5" />
+                </svg>
+                Download JSON
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      {% if results %}
+      <section class="results card">
+        <div class="results-head">
+          <h2>Live Headlines</h2>
+          <span class="count-pill">{{ results|length }} stories</span>
+        </div>
+        <ul class="results-grid">
+          {% for item in results %}
+          <li class="headline-card">
+            <div class="news-icon">
+              <svg viewBox="0 0 32 32" aria-hidden="true">
+                <path d="M6 10h20v14H6z" />
+                <path d="M10 6h12v4H10z" />
+                <path d="M10 14h6M10 18h6" />
+                <circle cx="21" cy="20" r="2" />
+              </svg>
+            </div>
+            <div class="card-body">
+              <div class="headline-row">
+                <h3>{{ item.title }}</h3>
+                <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" class="link-chip" aria-label="Open headline">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M14 3h7v7M10 14 21 3" />
+                    <path d="M5 12v7a2 2 0 0 0 2 2h7" />
+                  </svg>
+                </a>
+              </div>
+              <div class="meta-row">
+                <span class="source-tag">{{ item.source }}</span>
+                {% if item.published_at %}
+                <span class="time-tag">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v5l3 2" />
+                  </svg>
+                  {{ item.published_at }}
+                </span>
+                {% endif %}
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+
+      {% if saved_path %}
+      <section class="save-banner card">
+        <p>Latest snapshot saved to <code>{{ saved_path }}</code></p>
+      </section>
+      {% endif %}
+    </main>
+
+    <footer>
+      <p>Made by Bhagyashri</p>
+      <div class="social-icons">
+        <a href="https://github.com" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 2C6.477 2 2 6.577 2 12.11c0 4.444 2.865 8.213 6.839 9.542.5.095.682-.22.682-.486 0-.24-.01-1.033-.015-1.874-2.782.616-3.369-1.218-3.369-1.218-.455-1.178-1.11-1.492-1.11-1.492-.908-.633.069-.62.069-.62 1.003.072 1.531 1.05 1.531 1.05.892 1.557 2.341 1.108 2.91.847.091-.662.35-1.109.636-1.364-2.22-.258-4.555-1.137-4.555-5.057 0-1.118.39-2.033 1.029-2.75-.103-.257-.446-1.29.098-2.688 0 0 .84-.27 2.75 1.051a9.325 9.325 0 0 1 5 0c1.91-1.321 2.748-1.051 2.748-1.051.546 1.398.203 2.431.1 2.688.64.717 1.027 1.632 1.027 2.75 0 3.93-2.339 4.796-4.566 5.048.359.314.678.932.678 1.879 0 1.356-.013 2.448-.013 2.781 0 .269.18.584.688.485C19.138 20.32 22 16.553 22 12.11 22 6.578 17.523 2 12 2Z"
+            />
+          </svg>
+        </a>
+        <a href="https://twitter.com" target="_blank" rel="noopener" aria-label="Twitter">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M19.633 7.997c.013.18.013.36.013.54 0 5.49-4.18 11.82-11.82 11.82-2.35 0-4.54-.69-6.38-1.89.33.04.65.06.99.06a8.35 8.35 0 0 0 5.18-1.78 4.18 4.18 0 0 1-3.9-2.9c.26.04.52.07.8.07.38 0 .76-.05 1.11-.15a4.17 4.17 0 0 1-3.35-4.09v-.05c.56.31 1.21.5 1.9.52a4.17 4.17 0 0 1-1.86-3.47c0-.77.21-1.48.57-2.1a11.85 11.85 0 0 0 8.6 4.36 4.72 4.72 0 0 1-.1-.96A4.17 4.17 0 0 1 18.49 4a8.23 8.23 0 0 0 2.64-1.01 4.16 4.16 0 0 1-1.83 2.3 8.52 8.52 0 0 0 2.4-.64 8.98 8.98 0 0 1-2.07 2.31Z"
+            />
+          </svg>
+        </a>
+      </div>
+    </footer>
+
+    <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
+      <div class="spinner"></div>
+      <p>
+        Gathering headlines
+        <span id="loadingCountdown">(10s budget)</span>
+      </p>
+    </div>
+
+    <script>
+      const form = document.querySelector(".scrape-form");
+      const overlay = document.getElementById("loadingOverlay");
+      const countdownLabel = document.getElementById("loadingCountdown");
+      const SCRAPE_BUDGET_SECS = 10;
+      let countdownTimer;
+
+      if (form && overlay) {
+        form.addEventListener("submit", () => {
+          overlay.classList.add("visible");
+          if (countdownLabel) {
+            let remaining = SCRAPE_BUDGET_SECS;
+            countdownLabel.textContent = `(${remaining}s budget)`;
+            clearInterval(countdownTimer);
+            countdownTimer = setInterval(() => {
+              remaining -= 1;
+              if (remaining <= 0) {
+                countdownLabel.textContent = "(wrapping up…)";
+                clearInterval(countdownTimer);
+                return;
+              }
+              countdownLabel.textContent = `(${remaining}s budget)`;
+            }, 1000);
+          }
+        });
+      }
+      window.addEventListener("pageshow", () => {
+        overlay.classList.remove("visible");
+        clearInterval(countdownTimer);
+      });
+    </script>
+  </body>
+</html>
+
