@@ -32,3 +32,36 @@ A modern, user-friendly web application that automatically extracts the latest n
 ---
 
 
+---
+
+## 🧭 How It Works
+1. User clicks **“Show Headlines”**  
+2. Application fetches news from selected sources  
+3. Applies keyword filtering (if entered)  
+4. Displays results in **beautiful card-style UI**  
+5. User can download data as **CSV or JSON**
+
+---
+
+## 📦 Installation
+pip install -r requirements.txt
+python app.py
+http://127.0.0.1:5000/
+
+
+---
+
+## 📷 Screenshots (Add after you upload images)
+- Homepage view  
+- Headline cards UI  
+- Search bar  
+- Download buttons  
+- Loading animation  
+
+---
+
+## 📝 Author
+**Bhagyashri Wale**  
+GitHub: https://github.com/bhagyashri05-collab  
+
+
